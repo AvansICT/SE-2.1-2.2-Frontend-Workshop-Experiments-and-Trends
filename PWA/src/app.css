@@ -1,0 +1,172 @@
+:root {
+  --accent: #ff3e00;
+  --bg: #f6f6f4;
+  --card: #ffffff;
+  --text: #1d1d1b;
+  --muted: #6b6b66;
+  --border: #e4e4df;
+  --ok: #1f8a4c;
+  color-scheme: light;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161615;
+    --card: #222220;
+    --text: #ececea;
+    --muted: #a3a39d;
+    --border: #3a3a37;
+    --ok: #4cc281;
+    color-scheme: dark;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  /* Ruimte voor de notch / statusbalk als de app standalone draait */
+  padding: env(safe-area-inset-top) 1rem env(safe-area-inset-bottom);
+}
+
+header,
+main,
+footer {
+  max-width: 40rem;
+  margin: 0 auto;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem 0 1rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+}
+
+section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+section > p:first-of-type {
+  margin-top: 0;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.35rem 1rem;
+  margin: 0;
+}
+
+dt {
+  color: var(--muted);
+}
+
+dd {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(1.08);
+}
+
+button.link {
+  background: none;
+  color: var(--muted);
+  padding: 0.25rem 0.5rem;
+}
+
+input {
+  font: inherit;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+code {
+  font-size: 0.9em;
+}
+
+.pill {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: var(--ok);
+  color: white;
+}
+
+.pill.offline {
+  background: var(--muted);
+}
+
+.banner {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 0 -1rem;
+  padding: 0.75rem 1rem;
+  background: var(--text);
+  color: var(--bg);
+}
+
+.hint {
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+.ok {
+  color: var(--ok);
+}
+
+footer {
+  color: var(--muted);
+  font-size: 0.9rem;
+  padding: 0.5rem 0 2rem;
+}
+
+@media (max-width: 480px) {
+  dl {
+    grid-template-columns: 1fr;
+  }
+  dd {
+    margin-bottom: 0.5rem;
+  }
+}
