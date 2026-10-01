@@ -347,3 +347,43 @@ code {
     outline-offset: 2px;
   }
 }
+
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--code-bg);
+  color: var(--text-h);
+  font-size: 15px;
+}
+
+.banner-update {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.banner-btn {
+  padding: 4px 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+.banner-btn-ghost {
+  background: transparent;
+  color: var(--accent);
+}

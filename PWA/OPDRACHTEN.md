@@ -1,4 +1,4 @@
-# TODO – Les 05: PWA
+# Build your first PWA
 
 **Startpunt:** Een webapplicatie met een servercommunicatie en een formulier.
 **Eindresultaat:** een installeerbare app die na één bezoek ook offline werkt, met een offline-banner en een melding bij een nieuwe versie. Hij staat live op GitHub Pages.
@@ -72,8 +72,7 @@ export default defineConfig({
 ```
 
 - [ ] Voeg het script `"generate:icons": "pwa-assets-generator"` toe en voer het uit. Kijk welke PNG's er in `public/` bijkomen.
-- [ ] Vul in de plugin `manifest` in: `name`, `short_name`, `theme_color`, `background_color`, `display: "standalone"` en de `icons`.
-- [ ] Voeg in `index.html` een `apple-touch-icon` en een `theme-color` toe.
+- [ ] Voeg in `index.html` `<head>` een `apple-touch-icon` en een `theme-color` toe.
 
 ```html
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
@@ -82,7 +81,7 @@ export default defineConfig({
     <meta name="theme-color" content="#aa3bff" />
 ```
 
-**Controleer:** in DevTools → Application → Manifest staan de naam en iconen zonder fouten, en de browser biedt aan om de app te installeren.
+**Controleer:** in DevTools → Application → Manifest staan de naam en iconen zonder fouten, en de browser biedt aan om de app te installeren. Niets te zien? Kijk even bovenaan deze 😇😇 
 
 ## 3. Offline werken
 
@@ -169,10 +168,27 @@ export function OfflineBanner() {
 
 
 - [ ] Zet de banner in `Layout`, onder de navbar.
+```html
+<OfflineBanner />
+```
 
 > **Waarom `useSyncExternalStore`?** De online-status leeft buiten React. Deze hook is de React-manier om zo'n waarde te lezen, zonder `useEffect` + `useState`.
 
-## 5. Een melding bij een nieuwe versie
+## 5. Online zetten met GitHub Pages
+
+- [ ] Zet in `vite.config.ts` `base: process.env.BASE_PATH ?? "/"`: op GitHub Pages staat de app in een submap (`/<repo>/`).
+- [ ] Geef de router dezelfde submap mee: `createBrowserRouter(routes, { basename: import.meta.env.BASE_URL })`.
+- [ ] Maak een workflow in `.github/workflows/` die de app bouwt met `BASE_PATH`, `index.html` kopieert naar `404.html` en publiceert met `actions/deploy-pages`.
+- [ ] Zet op GitHub bij Settings → Pages de Source op "GitHub Actions".
+
+> **Waarom `404.html`?** GitHub Pages kent de React-routes niet: een directe link naar `/cars/renault` zou een 404 geven. Door `index.html` ook als 404-pagina te gebruiken, neemt React Router het over.
+> **Waarom GitHub Pages?** Een service worker werkt alleen via HTTPS (of op localhost), en dat regelt GitHub Pages.
+
+**Controleer:** open de live URL op je telefoon, installeer de app, zet vliegtuigmodus aan en open hem opnieuw.
+
+## 6. Een melding bij een nieuwe versie (needs improvement)
+
+** Werkt nog niet goed op localhost **
 
 - [ ] Activeer in VitePWA plugin `registerType: "prompt"`.
 - [ ] Maak `components/UpdatePrompt.tsx` met `useRegisterSW()` uit `virtual:pwa-register/react`.
@@ -186,7 +202,13 @@ export function UpdatePrompt() {
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
-  } = useRegisterSW();
+  } = useRegisterSW({
+    // The browser only checks for a new service worker on navigation; also check every minute
+    // so an open tab notices a new deploy without a manual reload.
+    onRegisteredSW(_swUrl, registration) {
+      if (registration) setInterval(() => registration.update(), 5 * 1000);
+    },
+  });
 
   if (!needRefresh) return null;
 
@@ -200,23 +222,9 @@ export function UpdatePrompt() {
 }
 ```
 
-
-- [ ] Toon een melding met een Reload-knop (`updateServiceWorker(true)`) als `needRefresh` true is.
 - [ ] Zet de melding ook in `Layout`.
 ```html
 <UpdatePrompt />
 ```
 
 **Controleer:** verander een tekst, bouw opnieuw en herlaad de preview. De melding verschijnt en Reload toont de nieuwe versie.
-
-## 6. Online zetten met GitHub Pages
-
-- [ ] Zet in `vite.config.ts` `base: process.env.BASE_PATH ?? "/"`: op GitHub Pages staat de app in een submap (`/<repo>/`).
-- [ ] Geef de router dezelfde submap mee: `createBrowserRouter(routes, { basename: import.meta.env.BASE_URL })`.
-- [ ] Maak een workflow in `.github/workflows/` die de app bouwt met `BASE_PATH`, `index.html` kopieert naar `404.html` en publiceert met `actions/deploy-pages`.
-- [ ] Zet op GitHub bij Settings → Pages de Source op "GitHub Actions".
-
-> **Waarom `404.html`?** GitHub Pages kent de React-routes niet: een directe link naar `/cars/renault` zou een 404 geven. Door `index.html` ook als 404-pagina te gebruiken, neemt React Router het over.
-> **Waarom GitHub Pages?** Een service worker werkt alleen via HTTPS (of op localhost), en dat regelt GitHub Pages.
-
-**Controleer:** open de live URL op je telefoon, installeer de app, zet vliegtuigmodus aan en open hem opnieuw.
