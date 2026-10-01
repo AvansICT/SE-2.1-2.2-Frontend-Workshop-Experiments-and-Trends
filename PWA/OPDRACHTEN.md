@@ -176,9 +176,74 @@ export function OfflineBanner() {
 
 ## 5. Online zetten met GitHub Pages
 
-- [ ] Zet in `vite.config.ts` `base: process.env.BASE_PATH ?? "/"`: op GitHub Pages staat de app in een submap (`/<repo>/`).
-- [ ] Geef de router dezelfde submap mee: `createBrowserRouter(routes, { basename: import.meta.env.BASE_URL })`.
+De base (basePath) in Vite is het pad waarop je app draait, standaard /. Bij een deploy in een subpath zoals https://gebruiker.github.io/mijn-repo/ zoekt de browser assets anders op /assets/... in plaats van /mijn-repo/assets/..., waardoor JS en CSS niet laden en je een wit scherm krijgt. Met base: '/mijn-repo/' in vite.config.ts zet Vite het juiste prefix voor alle paden, en vite-plugin-pwa gebruikt dat ook voor het manifest en de service worker.
+
 - [ ] Maak een workflow in `.github/workflows/` die de app bouwt met `BASE_PATH`, `index.html` kopieert naar `404.html` en publiceert met `actions/deploy-pages`.
+
+```yaml
+# Builds the PWA and publishes it on GitHub Pages:
+# https://<owner>.github.io/<repo>/
+name: Deploy PWA to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    #paths:
+    #  - "05_pwa/**"
+    # - ".github/workflows/deploy-pwa.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never run two deployments at the same time
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 05_pwa
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: 05_pwa/package-lock.json
+
+      - run: npm ci
+
+      # The app is served from /<repo>/, not from /
+      - run: npm run build
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}/
+
+      # GitHub Pages doesn't know the React routes: a deep link like /cars/renault would be a 404.
+      # Serving index.html as the 404 page lets React Router handle it.
+      - run: cp dist/index.html dist/404.html
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: 05_pwa/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
+```
+
 - [ ] Zet op GitHub bij Settings → Pages de Source op "GitHub Actions".
 
 > **Waarom `404.html`?** GitHub Pages kent de React-routes niet: een directe link naar `/cars/renault` zou een 404 geven. Door `index.html` ook als 404-pagina te gebruiken, neemt React Router het over.

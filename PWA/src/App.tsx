@@ -21,7 +21,10 @@ const router = createBrowserRouter([
       { path: "*", element: <NotFoundPage /> },
     ],
   },
-]);
+], {
+  // Same subfolder as "base" in vite.config.ts, e.g. "/SE-2.1-MyFirstPWA" on GitHub Pages
+  basename: import.meta.env.BASE_URL,
+});
 
 function App() {
   return <RouterProvider router={router} />;
